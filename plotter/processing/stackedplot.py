@@ -2,7 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
-from scipy.ndimage.filters import gaussian_filter1d
+from scipy.ndimage import gaussian_filter1d
 
 from plotter.processing.common import readCsvData, getDaylyAverageValues
 
@@ -11,15 +11,16 @@ def PlotStacked(ddir, pdir, output=False):
     filenames = os.listdir(ddir)
 
     for filename in filenames:
-        if filename.__contains__("sequences") and not filename.__contains__("Strombus"):
-            csv_data = readCsvData(os.path.join(ddir, filename))
-            csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)
+        csv_data = readCsvData(os.path.join(ddir, filename))
+        csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)
 
-            data = csv_df
-            normed_data = getDaylyAverageValues(data)
+        data = csv_df
+        normed_data = getDaylyAverageValues(data)
 
-            bus_names = ["Strom_HS_Eigenerzeugung", "WP_Abwaerme_Netz", "Strom_HS_Eigenverbrauch", "Strom_HS",
-                         "FünfundneunzigGradbus", "Nachheizhilfebus", "Ausspeicherbus", "Fernwaerme", "Direktleitungsbus"]
+        if filename.__contains__("sequences"): #and not filename.__contains__("Strombus"):
+
+
+            bus_names = ["Uebergabebus", "Gasbus", "Ofenbus", "Waermebus", "Waermespeicherbus", "Strombus"]
 
             for column in normed_data.columns:
                 new_column_name = column.replace("(", "").replace(")", "").replace(", 'flow'", "").replace(", ", "").replace("'", "")
@@ -52,22 +53,16 @@ def PlotStacked(ddir, pdir, output=False):
                                )
 
         elif filename.__contains__("Strombus"):
-            # mach was
-            csv_data = readCsvData(os.path.join(ddir, filename))
-            csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)
-
-            data = csv_df
-            normed_data = getDaylyAverageValues(data)
-
             for column in normed_data.columns:
                 new_column_name = column.replace("(", "").replace(")", "").replace(", 'flow'", "").replace(", ","")\
-                    .replace("'", "").replace("Strom_HS", "")
+                    .replace("'", "").replace("Strombus", "")
 
                 normed_data.rename(columns={column: new_column_name}, inplace=True)
-
                 normed_data[new_column_name] = gaussian_filter1d(normed_data[new_column_name], sigma=2)
 
-            data2plot = normed_data[["Import_Strom", "Ueberschuss_HS", "Trafo_Kosten_vnne"]]
+            print("normed:", filename)
+            print(normed_data)
+            data2plot = normed_data #[["Import_Strom", "PV_Eigenerzeugung", "Export_Strom", "Last_Strom","Last_WP", "elektr_Speicher", "excess_bel", "Übergabestation"]]
 
             if plt is not None:
                 fig = plt.figure()
@@ -81,7 +76,7 @@ def PlotStacked(ddir, pdir, output=False):
                                     ylabel="MW"
                                     )
 
-                data2plot = normed_data["Last_Strom"]
+                data2plot = normed_data
                 data2plot.plot(ax=ax)
 
         if filename.__contains__("sequences"):

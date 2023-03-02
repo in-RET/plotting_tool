@@ -107,7 +107,7 @@ class MainWindow(QWidget):
 
 
 def SankeyDiagramme(ddir, pdir, output=False):
-    picture = buildSankeyDiagram(ddir, "Energieflussdiagramm SWE", output=output)
+    picture = buildSankeyDiagram(ddir, "Energieflussdiagramm", output=output)
 
     file = open(os.path.join(pdir, "energieflussdiagramm_" + os.path.basename(ddir) + ".html"), 'wt')
     file.write(picture)

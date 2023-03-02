@@ -11,7 +11,7 @@ def buildLabel(text):
 
 
 def readCsvData(filename):
-    csv_data = pd.read_csv(filename, header=0, sep=",", index_col=0, decimal=",")
+    csv_data = pd.read_csv(filename, header=0, sep=",", index_col=0, decimal=".")
     return pd.DataFrame(csv_data)
 
 
@@ -24,7 +24,9 @@ def getDaylyAverageValues(df: pd.DataFrame) -> pd.DataFrame:
     while m < len(df.index.values):
         date = pd.to_datetime(df.index[n]).date()
 
+
         avg_data_row = pd.DataFrame.from_dict({date: df.iloc[n:m].sum() / 24}, orient="index")
+        #avg_data_row = pd.DataFrame.from_dict({date: df.iloc[n:m].sum()}, orient="index")
         avg_data = pd.concat([avg_data, avg_data_row])
 
         m += 24
@@ -36,10 +38,12 @@ def getDaylyAverageValues(df: pd.DataFrame) -> pd.DataFrame:
 def sumSingleColumnsFromData(dataframe) -> pd.Series:
     ret_data = {}
     for column_head in dataframe.columns:
+        print(column_head)
         tmp_float_list = []
 
         for rowValue in dataframe[column_head]:
-            tmp_float_list.append(rowValue)
+            tmp_float_list.append(float(rowValue))
+
 
         ret_data[column_head] = sum(tmp_float_list)
 
