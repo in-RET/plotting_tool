@@ -73,31 +73,6 @@ def buildSankeyDiagram(wdir, title, kompakt=True, output=False):
 
     dataframe, nodelist = buildDataFrame(data, nodelist, dataframe, kompakt)
 
-#    nodeColors = []
-#    for x in nodelist:
-#        hex_color = '#8000'
-#        for i in range(4):
-
-#            if i == 0:
-#                hex_color += random.choice('89abcdef')
-#            else:
-#                if i == 1:
-#                    hex_color += "a"
-#                else:
-#                    hex_color += "0"
-
-#        rgb = ImageColor.getrgb(hex_color)
-
-#        nodeColors.append("rgba(" + str(rgb[1]) + ", " + str(rgb[2]) + ", " + str(rgb[0]) + ", 0.5)")
-
-#    i = 0
-#    for entry in dataframe['color']:
-#        if entry != 0:
-#            index = nodelist.index(entry)
-#            color = nodeColors[index]
-#            dataframe.loc[:, ('color', i)] = color
-#            i += 1
-
     fig = go.Figure(
         data=[go.Sankey(
             valueformat=".0f",

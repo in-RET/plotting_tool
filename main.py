@@ -26,5 +26,5 @@ if __name__ == '__main__':
         if not os.path.exists(path_save):
             os.makedirs(path_save)
 
-        GoPlots(path_load, path_save, False, False)
+        GoPlots(path_load, path_save, False, False, False)
 
