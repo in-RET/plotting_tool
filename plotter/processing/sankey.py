@@ -3,10 +3,10 @@ import random
 
 import pandas as pd
 import plotly.graph_objects as go
-
 from PIL import ImageColor
 
-from plotter.processing.common import buildLabel, readCsvData, sumSingleColumnsFromData
+from plotter.processing.common import (buildLabel, readCsvData,
+                                       sumSingleColumnsFromData)
 
 
 def optimizeNodelistCandidate(nodelist):
@@ -25,6 +25,9 @@ def buildDataFrame(singleData, nodes, df, kompakt):
 
         tmp_str = tmp_str.replace("(", "").replace(")", "").replace(" ", "").replace("'", "")
         tmp_str = tmp_str.split(",")
+
+        if len(tmp_str) < 2:
+            tmp_str.append("None")
 
         if kompakt:
             tmp_str[0] = optimizeNodelistCandidate(tmp_str[0])

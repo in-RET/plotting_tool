@@ -1,8 +1,8 @@
 import os
 
+from plotter.processing.radarplot import buildRadarPlot
 from plotter.processing.sankey import buildSankeyDiagram
 from plotter.processing.stackedplot import PlotStacked
-from plotter.processing.radarplot import buildRadarPlot
 
 
 def GoPlots(wpath, spath, out_plot=False, out_sankey=False, out_radar=False):
@@ -28,13 +28,13 @@ def GoPlots(wpath, spath, out_plot=False, out_sankey=False, out_radar=False):
 
 def RadarPlots(ddir, pdir, output=False):
     picture = buildRadarPlot(ddir, "Radarplot", output=output)
-    file = open(os.path.join(pdir, "radarplot_" + os.path.basename(ddir) + ".html"), 'wt')
+    file = open(os.path.join(pdir, "radarplot_" + os.path.basename(ddir) + ".html"), 'wt', encoding="utf8")
     file.write(picture)
     file.close()
 
 def SankeyDiagramme(ddir, pdir, output=False):
     picture = buildSankeyDiagram(ddir, "Energieflussdiagramm", output=output)
 
-    file = open(os.path.join(pdir, "energieflussdiagramm_" + os.path.basename(ddir) + ".html"), 'wt')
+    file = open(os.path.join(pdir, "energieflussdiagramm_" + os.path.basename(ddir) + ".html"), 'wt', encoding="utf8")
     file.write(picture)
     file.close()
