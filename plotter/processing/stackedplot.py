@@ -6,7 +6,6 @@ from scipy.ndimage import gaussian_filter1d
 
 from plotter.processing.common import readCsvData, getDaylyAverageValues
 
-
 def PlotStacked(ddir, pdir, output=False):
     filenames = os.listdir(ddir)
 

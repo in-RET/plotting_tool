@@ -5,7 +5,7 @@ from plotter.processing.stackedplot import PlotStacked
 from plotter.processing.radarplot import buildRadarPlot
 
 
-def GoPlots(wpath, spath, out_plot, out_sankey, out_radar):
+def GoPlots(wpath, spath, out_plot=False, out_sankey=False, out_radar=False):
     print("Erstelle Plots")
 
     datafolders = []
@@ -19,16 +19,16 @@ def GoPlots(wpath, spath, out_plot, out_sankey, out_radar):
 
         if not os.path.exists(pdir):
             os.makedirs(pdir)
-
+        
         SankeyDiagramme(ddir=ddir, pdir=pdir, output=out_sankey)
         PlotStacked(ddir=ddir, pdir=pdir, output=out_plot)
-        RadarPlots(ddir=ddir, pdir=pdir, output=out_radar)
+        #RadarPlots(ddir=ddir, pdir=pdir, output=out_radar)
 
     print("Fin.")
 
 def RadarPlots(ddir, pdir, output=False):
     picture = buildRadarPlot(ddir, "Radarplot", output=output)
-    file = open(os.path.join(pdir, "radarplot" + os.path.basename(ddir) + ".html"), 'wt')
+    file = open(os.path.join(pdir, "radarplot_" + os.path.basename(ddir) + ".html"), 'wt')
     file.write(picture)
     file.close()
 

@@ -50,11 +50,11 @@ def buildRadarPlot(wdir, title, kompakt=True, output=True):
         else: print("Fehler!", position)
         position += 1
 
-    print(import_list)
-    print(import_nodelist)
+    #print(import_list)
+    #print(import_nodelist)
 
-    print(export_list)
-    print(export_nodelist)
+    #print(export_list)
+    #print(export_nodelist)
 
     fig = go.Figure()
 

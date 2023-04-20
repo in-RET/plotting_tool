@@ -3,7 +3,10 @@ import sys
 from common import GoPlots
 
 try:
-    from PyQt5.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QCheckBox, QProgressBar
+    from PyQt6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel
+    from PyQt6.QtGui import QPixmap
+    from PyQt6.QtCore import QUrl
+    from PyQt6.QtWebEngineWidgets import QWebEngineView
     PYQT = True
 except ModuleNotFoundError:
     PYQT = False
@@ -26,40 +29,40 @@ if PYQT:
             self.initUI()
 
         def initUI(self):
-            hbox = QVBoxLayout()
+            hbox_input = QHBoxLayout()
+            hbox_output = QHBoxLayout()
+            vbox = QVBoxLayout()
 
+            ### Input GUI
             button_load_data = QPushButton("Daten-Ordner auswählen", self)
             button_load_data.clicked.connect(self.GetFolderName)
             button_load_data.setObjectName("load")
-            hbox.addWidget(button_load_data)
+            hbox_input.addWidget(button_load_data)
 
-            hbox.addSpacing(25)
-
-            self.checkbox_plots = QCheckBox("Zeige Plot-Ausgabe")
-            hbox.addWidget(self.checkbox_plots)
-
-            self.checkbox_sankey = QCheckBox("Zeige Sankey-Ausgabe")
-            hbox.addWidget(self.checkbox_sankey)
+            hbox_input.addStretch()
 
             self.button_plot = QPushButton("Erstelle Diagramme", self)
             self.button_plot.clicked.connect(self.GoPlot)
             self.button_plot.setObjectName("go")
             self.button_plot.setEnabled(False)
-            hbox.addWidget(self.button_plot)
-
-            self.progressbar = QProgressBar()
-            hbox.addWidget(self.progressbar)
-
-            hbox.addSpacing(15)
+            hbox_input.addWidget(self.button_plot)
 
             qbtn = QPushButton('Quit', self)
             qbtn.clicked.connect(QApplication.instance().quit)
 
-            hbox.addWidget(qbtn)
+            hbox_input.addWidget(qbtn)
 
-            self.setLayout(hbox)
+            ### Output GUI
+            self.tabs = QTabWidget()
 
-            self.move(300, 300)
+            hbox_output.addWidget(self.tabs)
+
+            vbox.addLayout(hbox_input)
+            vbox.addLayout(hbox_output)
+
+            self.setLayout(vbox)
+
+            self.setGeometry(300, 300, 750, 550)
             self.setWindowTitle('Plot Tool')
             self.show()
 
@@ -68,7 +71,7 @@ if PYQT:
             path = filedialog.getExistingDirectory(self, 'Ordner öffnen')
 
             self.path_load = path
-            self.path_save = os.path.join(path, "../plots")
+            self.path_save = os.path.abspath(os.path.join(path, "../plots"))
 
             if not os.path.exists(self.path_save):
                 os.makedirs(self.path_save)
@@ -78,8 +81,54 @@ if PYQT:
             # print("Laden:", self.path_load)
             # print("Speichern:", self.path_save)
 
+        def AddPlotTab(self):
+            # der Pfad wo die Dateien liegen
+            wdir = os.path.abspath(self.path_save)
+            
+            if wdir is not None:
+                dirData = []
+                for tmpDirData in os.walk(wdir):
+                    #print(tmpDirData)
+                    dirData.extend(tmpDirData)
+                
+                for file in dirData[2]:
+                    filename = os.path.basename(file)
+                    if str.find(filename, ".png") > 0:
+                        #print("png")
+                        tab = QWidget()
+
+                        image = QPixmap(os.path.join(wdir, filename))
+                        label = QLabel()
+                        label.setPixmap(image)
+
+                        vbox = QVBoxLayout()
+                        vbox.addWidget(label)
+                        tab.setLayout(vbox)
+
+                        self.tabs.addTab(tab, filename)
+
+                    elif str.find(filename, ".html") > 0:
+                        #print("html")
+                        tab = QWidget()
+
+                        browser = QWebEngineView()
+                        #browser.setHtml("<h1>Hello, world!</h1>")
+                        browser.load(QUrl.fromLocalFile(os.path.join(wdir, filename)))
+
+                        vbox = QVBoxLayout()
+                        vbox.addWidget(browser)
+                        tab.setLayout(vbox)
+                        
+                        self.tabs.addTab(tab, filename)
+
+                    else:
+                        print("Nicht Identifiziert")
+
+
         def GoPlot(self):
-            GoPlots(self.path_load, self.path_save, self.checkbox_sankey.isChecked(), self.checkbox_plots.isChecked())
+            GoPlots(self.path_load, self.path_save)
+            self.AddPlotTab()
+            self.button_plot.setEnabled(False)
 
 
     def StartGui():

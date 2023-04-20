@@ -3,7 +3,6 @@ import os
 
 from common import GoPlots
 from gui import PYQT
-from pathlib import Path
 
 
 if __name__ == '__main__':
@@ -26,5 +25,4 @@ if __name__ == '__main__':
         if not os.path.exists(path_save):
             os.makedirs(path_save)
 
-        GoPlots(path_load, path_save, False, False, False)
-
+        GoPlots(path_load, path_save)
