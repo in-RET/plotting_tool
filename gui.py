@@ -3,14 +3,14 @@ import sys
 from common import GoPlots
 
 try:
-    from PyQt6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel
-    from PyQt6.QtGui import QPixmap
-    from PyQt6.QtCore import QUrl
-    from PyQt6.QtWebEngineWidgets import QWebEngineView
+    from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel
+    from PySide6.QtGui import QPixmap
+    from PySide6.QtCore import QUrl, QFileInfo, QObject
+    from PySide6.QtWebEngineWidgets import QWebEngineView
     PYQT = True
 except ModuleNotFoundError:
     PYQT = False
-    print("Please install PyQt5 to start the application with a graphical user interface.")
+    print("Please install PySide6 to start the application with a graphical user interface.")
 
 
 if PYQT:
@@ -111,12 +111,13 @@ if PYQT:
                         #print("html")
                         tab = QWidget()
 
-                        browser = QWebEngineView()
-                        #browser.setHtml("<h1>Hello, world!</h1>")
-                        browser.load(QUrl.fromLocalFile(os.path.join(wdir, filename)))
+                        webview = QWebEngineView()
+                        webview.load(QUrl.fromLocalFile(os.path.join(wdir, filename)))
+
+                        webview.page().profile().downloadRequested.connect(self.on_downloadRequested)
 
                         vbox = QVBoxLayout()
-                        vbox.addWidget(browser)
+                        vbox.addWidget(webview)
                         tab.setLayout(vbox)
                         
                         self.tabs.addTab(tab, filename)
@@ -130,6 +131,16 @@ if PYQT:
             self.AddPlotTab()
             self.button_plot.setEnabled(False)
 
+        def on_downloadRequested(self, download: QObject):
+            old_path = download.url().path()  # download.path()
+            suffix = "png"
+            path, _ = QFileDialog.getSaveFileName(
+                self, "Save File", old_path, "*." + suffix
+            )
+            if path:
+                download.setDownloadDirectory(os.path.dirname(path))
+                download.setDownloadFileName(os.path.basename(path))
+                download.accept()
 
     def StartGui():
         app = QApplication(sys.argv)
