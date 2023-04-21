@@ -17,7 +17,7 @@ def readCsvData(filename):
     status_cols = []
 
     for column_head in dataframe.columns:
-        print(column_head)
+        #print(column_head)
         if str.find(column_head, "status") > 0:
             status_cols.append(column_head)
 
@@ -36,7 +36,6 @@ def getDaylyAverageValues(df: pd.DataFrame) -> pd.DataFrame:
 
     while m < len(df.index.values):
         date = pd.to_datetime(df.index[n]).date()
-
 
         avg_data_row = pd.DataFrame.from_dict({date: df.iloc[n:m].sum() / 24}, orient="index")
         #avg_data_row = pd.DataFrame.from_dict({date: df.iloc[n:m].sum()}, orient="index")
