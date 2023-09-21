@@ -17,8 +17,6 @@ def PlotStacked(ddir, pdir, output=False):
         normed_data = getDaylyAverageValues(data)
 
         if filename.__contains__("sequences"): #and not filename.__contains__("Strombus"):
-
-
             bus_names = ["Uebergabebus", "Gasbus", "Ofenbus", "Waermebus", "Waermespeicherbus", "Strombus"]
 
             for column in normed_data.columns:
@@ -58,8 +56,8 @@ def PlotStacked(ddir, pdir, output=False):
                 normed_data.rename(columns={column: new_column_name}, inplace=True)
                 normed_data[new_column_name] = gaussian_filter1d(normed_data[new_column_name], sigma=2)
 
-            print("normed:", filename)
-            print(normed_data)
+            #print("normed:", filename)
+            #print(normed_data)
             data2plot = normed_data #[["Import_Strom", "PV_Eigenerzeugung", "Export_Strom", "Last_Strom","Last_WP", "elektr_Speicher", "excess_bel", "Übergabestation"]]
 
             if plt is not None:

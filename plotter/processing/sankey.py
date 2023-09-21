@@ -58,13 +58,10 @@ def buildDataFrame(singleData, nodes, df, kompakt):
 
 def buildSankeyDiagram(wdir, title, kompakt=True, output=False):
     filenames = os.listdir(wdir)
-
     data = pd.DataFrame()
 
     for filename in filenames:
         if filename.__contains__("sequences"):
-            #print(filename)
-
             csv_data = readCsvData(os.path.join(wdir, filename))
             csv_data = sumSingleColumnsFromData(csv_data)
             csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)

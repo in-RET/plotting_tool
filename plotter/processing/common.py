@@ -17,11 +17,8 @@ def readCsvData(filename):
     status_cols = []
 
     for column_head in dataframe.columns:
-        #print(column_head)
         if str.find(column_head, "status") > 0:
             status_cols.append(column_head)
-
-    print(status_cols)
 
     dataframe = dataframe.drop(columns=status_cols)
 
@@ -50,7 +47,6 @@ def getDaylyAverageValues(df: pd.DataFrame) -> pd.DataFrame:
 def sumSingleColumnsFromData(df: pd.DataFrame) -> pd.Series:
     ret_data = {}
     for column_head in df.columns:
-        #print(column_head)
         tmp_float_list = []
 
         for rowValue in df[column_head]:
