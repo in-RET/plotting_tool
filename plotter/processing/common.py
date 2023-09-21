@@ -47,12 +47,6 @@ def getDaylyAverageValues(df: pd.DataFrame) -> pd.DataFrame:
 def sumSingleColumnsFromData(df: pd.DataFrame) -> pd.Series:
     ret_data = {}
     for column_head in df.columns:
-        tmp_float_list = []
-
-        for rowValue in df[column_head]:
-            tmp_float_list.append(float(rowValue))
-
-
-        ret_data[column_head] = sum(tmp_float_list)
+        ret_data[column_head] = df[column_head].sum()
 
     return pd.Series(index=df.columns, data=ret_data)
