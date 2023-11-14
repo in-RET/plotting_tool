@@ -11,7 +11,7 @@ def buildLabel(text):
 
 
 def readCsvData(filename):
-    csv_data = pd.read_csv(filename, header=0, sep=",", index_col=0, decimal=".")
+    csv_data = pd.read_csv(filename, header=0, sep=";", index_col=0, decimal=",")
     dataframe = pd.DataFrame(csv_data)
 
     status_cols = []

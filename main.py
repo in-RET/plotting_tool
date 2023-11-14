@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from common import GoPlots
+from common import plots
 from gui import PYQT
 
 
@@ -20,9 +20,9 @@ if __name__ == '__main__':
         args = parser.parse_args()
 
         path_load = args.folder
-        path_save = os.path.join(args.folder, "../plots")
+        path_save = os.path.join(args.folder, "plots")
 
         if not os.path.exists(path_save):
             os.makedirs(path_save)
 
-        GoPlots(path_load, path_save)
+        plots(path_load, path_save)

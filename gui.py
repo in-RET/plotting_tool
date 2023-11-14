@@ -1,6 +1,6 @@
 import os
 import sys
-from common import GoPlots
+from common import plots
 
 try:
     from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel
@@ -71,7 +71,7 @@ if PYQT:
             path = filedialog.getExistingDirectory(self, 'Ordner öffnen')
 
             self.path_load = path
-            self.path_save = os.path.abspath(os.path.join(path, "../plots"))
+            self.path_save = os.path.abspath(os.path.join(path, "..", "plots"))
 
             if not os.path.exists(self.path_save):
                 os.makedirs(self.path_save)
@@ -93,7 +93,7 @@ if PYQT:
                 
                 for file in dirData[2]:
                     filename = os.path.basename(file)
-                    if str.find(filename, ".png") > 0:
+                    if str.find(filename, ".png") > 0 and not filename == "energy_system.png":
                         #print("png")
                         tab = QWidget()
 
@@ -127,7 +127,7 @@ if PYQT:
 
 
         def GoPlot(self):
-            GoPlots(self.path_load, self.path_save)
+            plots(self.path_load, self.path_save)
             self.AddPlotTab()
             self.button_plot.setEnabled(False)
 

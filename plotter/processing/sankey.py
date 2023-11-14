@@ -9,17 +9,8 @@ from plotter.processing.common import (buildLabel, readCsvData,
                                        sumSingleColumnsFromData)
 
 
-def optimizeNodelistCandidate(nodelist):
-    if nodelist.__contains__("AHK_"):
-        nodelist = nodelist[0:5]
-
-    if nodelist.__contains__("ST_"):
-        nodelist = nodelist[0:2]
-
-    return nodelist
-
-
-def buildDataFrame(singleData, nodes, df, kompakt):
+def buildDataFrame(singleData, nodes, df):
+    print(singleData)
     for index in singleData.index:
         tmp_str = index
 
@@ -28,13 +19,6 @@ def buildDataFrame(singleData, nodes, df, kompakt):
 
         if len(tmp_str) < 2:
             tmp_str.append("None")
-
-        if kompakt:
-            tmp_str[0] = optimizeNodelistCandidate(tmp_str[0])
-            tmp_str[1] = optimizeNodelistCandidate(tmp_str[1])
-
-        tmp_str[0] = buildLabel(tmp_str[0])
-        tmp_str[1] = buildLabel(tmp_str[1])
 
         if not nodes.__contains__(tmp_str[0]):
             nodes.append(tmp_str[0])
@@ -56,22 +40,21 @@ def buildDataFrame(singleData, nodes, df, kompakt):
     return df, nodes
 
 
-def buildSankeyDiagram(wdir, title, kompakt=True, output=False):
+def buildSankeyDiagram(wdir, title, output=False):
     filenames = os.listdir(wdir)
     data = pd.DataFrame()
 
     for filename in filenames:
-        if filename.__contains__("sequences"):
-            csv_data = readCsvData(os.path.join(wdir, filename))
-            csv_data = sumSingleColumnsFromData(csv_data)
-            csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)
+        csv_data = readCsvData(os.path.join(wdir, filename))
+        csv_data = sumSingleColumnsFromData(csv_data)
+        csv_df = pd.DataFrame(index=csv_data.index, data=csv_data)
 
-            data = pd.concat([data, csv_df])
+        data = pd.concat([data, csv_df])
 
     dataframe = pd.DataFrame(columns=["input", "output", "value", "label", "color"])
     nodelist = []
 
-    dataframe, nodelist = buildDataFrame(data, nodelist, dataframe, kompakt)
+    dataframe, nodelist = buildDataFrame(data, nodelist, dataframe)
 
     fig = go.Figure(
         data=[go.Sankey(
