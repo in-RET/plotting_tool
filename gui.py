@@ -128,7 +128,7 @@ if PYQT:
 
         def GoPlot(self):
             plots(self.path_load, self.path_save)
-            self.AddPlotTab()
+            #self.AddPlotTab()
             self.button_plot.setEnabled(False)
 
         def on_downloadRequested(self, download: QObject):

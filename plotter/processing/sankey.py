@@ -10,7 +10,6 @@ from plotter.processing.common import (buildLabel, readCsvData,
 
 
 def buildDataFrame(singleData, nodes, df):
-    print(singleData)
     for index in singleData.index:
         tmp_str = index
 
