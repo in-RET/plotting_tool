@@ -1,11 +1,13 @@
 import os
+import threading
 
 from plotter.processing.sankey import buildSankeyDiagram
 from plotter.processing.stackedplot import buildStackedPlot
 
-
-def plots(wpath, spath, out_sankey=False):
+def plots(wpath, spath, window, pyqt=False, out_sankey=False):
     print("Erstelle Plots")
+    if pyqt:
+        window.AddLogLine("Erstelle Plots")
 
     datafolder = []
 
@@ -19,11 +21,18 @@ def plots(wpath, spath, out_sankey=False):
         if not os.path.exists(pdir):
             os.makedirs(pdir)
         
-        sankeyDiagramme(ddir=ddir, pdir=pdir, output=out_sankey)
-        buildStackedPlot(ddir=ddir, pdir=pdir)
+        t_sankey = threading.Thread(target=sankeyDiagramme, args=(ddir, pdir, out_sankey))
+        t_stacked = threading.Thread(target=buildStackedPlot, args=(ddir, pdir))
+        
+        t_sankey.start()
+        t_stacked.start()
+        
+        #sankeyDiagramme(ddir=ddir, pdir=pdir, output=out_sankey)
+        #buildStackedPlot(ddir=ddir, pdir=pdir)
 
     print("Fin.")
-
+    if pyqt:
+        window.AddLogLine("Fertig.")
 
 def sankeyDiagramme(ddir, pdir, output=False):
     picture = buildSankeyDiagram(ddir, "Energieflussdiagramm", output=output)

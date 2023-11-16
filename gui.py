@@ -1,11 +1,12 @@
 import os
 import sys
 from common import plots
+import threading
 
 try:
-    from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel
+    from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel, QTextBrowser
     from PySide6.QtGui import QPixmap
-    from PySide6.QtCore import QUrl, QFileInfo, QObject
+    from PySide6.QtCore import QUrl, QFileInfo, QObject, QRect
     from PySide6.QtWebEngineWidgets import QWebEngineView
     PYQT = True
 except ModuleNotFoundError:
@@ -53,13 +54,20 @@ if PYQT:
             hbox_input.addWidget(qbtn)
 
             ### Output GUI
-            self.tabs = QTabWidget()
+            #self.tabs = QTabWidget()
 
-            hbox_output.addWidget(self.tabs)
+            #hbox_output.addWidget(self.tabs)
+
+
+
+            self.outputBox= QTextBrowser()
+            #self.outputBox.setGeometry(QRect(10, 90, 331, 111))
+            self.outputBox.setObjectName("outputBox")
+            hbox_output.addWidget(self.outputBox)       
+
 
             vbox.addLayout(hbox_input)
             vbox.addLayout(hbox_output)
-
             self.setLayout(vbox)
 
             self.setGeometry(300, 300, 750, 550)
@@ -125,9 +133,11 @@ if PYQT:
                     else:
                         print("Nicht Identifiziert")
 
+        def AddLogLine(self, text):
+            self.outputBox.append(text)
 
         def GoPlot(self):
-            plots(self.path_load, self.path_save)
+            plots(self.path_load, self.path_save, self, pyqt=PYQT)
             #self.AddPlotTab()
             self.button_plot.setEnabled(False)
 
