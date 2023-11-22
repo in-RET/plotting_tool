@@ -12,6 +12,8 @@ def buildStackedPlot(ddir, pdir):
     filenames = os.listdir(ddir)
 
     for filename in filenames:
+        print(filename)
+
         csv_data = readCsvData(os.path.join(ddir, filename))
         data = pd.DataFrame(index=csv_data.index, data=csv_data)
         normed_data = getDaylyAverageValues(data)
@@ -103,15 +105,37 @@ def buildStackedPlot(ddir, pdir):
 
         fig, ax = plt.subplots(figsize=(19.1, 10.5))
 
-        for column in dauerlinie_data:
-            jahresdauerlinie = sorted(data[column], reverse=True)
+        waermepumpen_liste = [column for column in dauerlinie_data.columns if column.startswith("WP_")]
+        
+        jahresdauerlinie_wp = None
+        #print(type(jahresdauerlinie_wp))
 
+        for column in dauerlinie_data:
+            if column in waermepumpen_liste:
+                if type(jahresdauerlinie_wp) == type(None) and jahresdauerlinie_wp == None:
+                    jahresdauerlinie_wp = dauerlinie_data[column]
+                else:
+                    jahresdauerlinie_wp = jahresdauerlinie_wp.add(dauerlinie_data[column])
+                #print(jahresdauerlinie_wp)
+            else:
+                dauerlinie_data[column] = sorted(dauerlinie_data[column], reverse=True)
+                jahresdauerlinie = dauerlinie_data[column]
+
+                plt.plot(
+                    np.linspace(1,8760, 8760),
+                    jahresdauerlinie,
+                    label=column,
+                    drawstyle="steps-post"
+                )
+
+        if not type(jahresdauerlinie_wp) == type(None):
             plt.plot(
                 np.linspace(1,8760, 8760),
-                jahresdauerlinie,
-                label=column,
+                sorted(jahresdauerlinie_wp, reverse=True),
+                label="Wärmepumpen",
                 drawstyle="steps-post"
             )
+        
         plt.legend(loc='center left',
                    bbox_to_anchor=(1, 0.5),
                    ncol=1,
