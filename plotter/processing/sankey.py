@@ -58,7 +58,7 @@ def buildSankeyDiagram(wdir, title, output=False):
     fig = go.Figure(
         data=[go.Sankey(
             valueformat=".0f",
-            valuesuffix=" MW",
+            valuesuffix=" MWh",
             # Define nodes
             node=dict(
                 pad=15,
