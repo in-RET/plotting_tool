@@ -4,7 +4,7 @@ from common import plots
 import threading
 
 try:
-    from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel, QTextBrowser
+    from PySide6.QtWidgets import QPushButton, QWidget, QApplication, QVBoxLayout, QFileDialog, QProgressBar, QTabWidget, QHBoxLayout, QLabel, QTextBrowser, QCheckBox
     from PySide6.QtGui import QPixmap
     from PySide6.QtCore import QUrl, QFileInfo, QObject, QRect
     from PySide6.QtWebEngineWidgets import QWebEngineView
@@ -39,6 +39,15 @@ if PYQT:
             button_load_data.clicked.connect(self.GetFolderName)
             button_load_data.setObjectName("load")
             hbox_input.addWidget(button_load_data)
+
+            hbox_input.addStretch()
+
+            self.checkbox_plots = QCheckBox("Stacked plots", self)
+            self.checkbox_sankey = QCheckBox("Sankeys", self)
+            self.checkbox_sankey.setChecked(True)
+
+            hbox_input.addWidget(self.checkbox_sankey)
+            hbox_input.addWidget(self.checkbox_plots)
 
             hbox_input.addStretch()
 
@@ -137,7 +146,9 @@ if PYQT:
             self.outputBox.append(text)
 
         def GoPlot(self):
-            plots(self.path_load, self.path_save, self, pyqt=PYQT)
+            plotPlots = self.checkbox_plots.isChecked()
+            plotSankey = self.checkbox_sankey.isChecked()
+            plots(self.path_load, self.path_save, self, plotSankey, plotPlots, pyqt=PYQT)
             #self.AddPlotTab()
             self.button_plot.setEnabled(False)
 

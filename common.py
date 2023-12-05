@@ -6,7 +6,7 @@ from PySide6.QtCore import QProcess
 from plotter.processing.sankey import buildSankeyDiagram
 from plotter.processing.stackedplot import buildStackedPlot
 
-def plots(wpath, spath, window, pyqt=False, out_sankey=False):
+def plots(wpath, spath, window, plotSankey, plotStacked, pyqt=False):
     print("Erstelle Plots")
     if pyqt:
         window.AddLogLine("Erstelle Plots")
@@ -28,11 +28,13 @@ def plots(wpath, spath, window, pyqt=False, out_sankey=False):
         #t_stacked = threading.Thread(target=buildStackedPlot, args=(ddir, pdir))
         
         ## Second Attempt
-        t_sankey = multiprocessing.Process(target=sankeyDiagramme, args=(ddir, pdir, out_sankey))
-        t_stacked = multiprocessing.Process(target=buildStackedPlot, args=(ddir, pdir))
-        
-        t_sankey.start()
-        t_stacked.start()
+        if plotSankey:
+            t_sankey = multiprocessing.Process(target=sankeyDiagramme, args=(ddir, pdir))
+            t_sankey.start()
+
+        if plotStacked:
+            t_stacked = multiprocessing.Process(target=buildStackedPlot, args=(ddir, pdir))
+            t_stacked.start()
 
         ## Third Attempt
         #process = QProcess()
