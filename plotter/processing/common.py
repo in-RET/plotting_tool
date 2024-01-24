@@ -50,3 +50,22 @@ def sumSingleColumnsFromData(df: pd.DataFrame) -> pd.Series:
         ret_data[column_head] = df[column_head].sum()
 
     return pd.Series(index=df.columns, data=ret_data)
+
+
+def reduceNodeName(node: str) -> str:
+    reduceNodeName = ""
+
+    reduceNodeName = node.replace("HWE_5_1_Nachheizung", "HWE_5_1").replace("HWE_5_1_Heißwasser", "HWE_5_1")
+    reduceNodeName = reduceNodeName.replace("AHK_1_KB", "AHK_1").replace("AHK_1_FB", "AHK_1").replace("AHK_1_AB", "AHK_1")
+    reduceNodeName = reduceNodeName.replace("AHK_2_KB", "AHK_2").replace("AHK_2_FB", "AHK_2").replace("AHK_2_AB", "AHK_2")
+    reduceNodeName = reduceNodeName.replace("AHK_1_Biogas_KB", "AHK_1_Biogas").replace("AHK_1_Biogas_FB", "AHK_1_Biogas").replace("AHK_1_Biogas_AB", "AHK_1_Biogas")
+    reduceNodeName = reduceNodeName.replace("AHK_2_Biogas_KB", "AHK_2_Biogas").replace("AHK_2_Biogas_FB", "AHK_2_Biogas").replace("AHK_2_Biogas_AB", "AHK_2_Biogas")
+    reduceNodeName = reduceNodeName.replace("AHK_1_H2_KB", "AHK_1_H2").replace("AHK_1_H2_FB", "AHK_1_H2").replace("AHK_1_H2_AB", "AHK_1_H2")
+    reduceNodeName = reduceNodeName.replace("AHK_2_H2_KB", "AHK_2_H2").replace("AHK_2_H2_FB", "AHK_2_H2").replace("AHK_2_H2_AB", "AHK_2_H2")
+    reduceNodeName = reduceNodeName.replace("AHK_3_AB", "AHK_3")
+    reduceNodeName = reduceNodeName.replace("DT-Tandem HD-Teil", "DT-Tandem").replace("DT-Tandem ND-Teil", "DT-Tandem")
+
+    if reduceNodeName.startswith("WP_"):
+        reduceNodeName = "Wärmepumpen"
+
+    return reduceNodeName

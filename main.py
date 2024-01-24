@@ -11,9 +11,9 @@ if __name__ == '__main__':
         StartGui()
     else:
         parser = argparse.ArgumentParser(
-            prog = 'main.py',
+            prog='main.py',
             description='Tool to plot sankey diagrams and normale line plots form csv-files.',
-            epilog = 'In.RET - Institut für regenerative Energietechnik'
+            epilog='In.RET - Institut für regenerative Energietechnik'
         )
 
         parser.add_argument('folder', help="Filepath of the csv-files.")

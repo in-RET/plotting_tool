@@ -1,12 +1,11 @@
 import os
-import random
 
 import pandas as pd
 import plotly.graph_objects as go
-from PIL import ImageColor
 
-from plotter.processing.common import (buildLabel, readCsvData,
-                                       sumSingleColumnsFromData)
+from plotter.processing.common import (readCsvData,
+                                       sumSingleColumnsFromData,
+                                       reduceNodeName)
 
 
 def buildDataFrame(singleData, nodes, df):
@@ -18,6 +17,9 @@ def buildDataFrame(singleData, nodes, df):
 
         if len(tmp_str) < 2:
             tmp_str.append("None")
+
+        tmp_str[0] = reduceNodeName(tmp_str[0])
+        tmp_str[1] = reduceNodeName(tmp_str[1])
 
         if not nodes.__contains__(tmp_str[0]):
             nodes.append(tmp_str[0])

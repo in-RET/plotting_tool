@@ -5,40 +5,65 @@ import numpy as np
 import pandas as pd
 from scipy.ndimage import gaussian_filter1d
 
-from plotter.processing.common import readCsvData, getDaylyAverageValues
+from plotter.processing.common import readCsvData, getDaylyAverageValues, reduceNodeName
 
 
 def buildStackedPlot(ddir, pdir):
     filenames = os.listdir(ddir)
 
+    os.makedirs(os.path.join(pdir, "Jahresganglinien"), exist_ok=True)
+    os.makedirs(os.path.join(pdir, "Area Plots"), exist_ok=True)
+    os.makedirs(os.path.join(pdir, "Stacked Plots"), exist_ok=True)
+
     for filename in filenames:
         print(filename)
 
-        csv_data = readCsvData(os.path.join(ddir, filename))
-        data = pd.DataFrame(index=csv_data.index, data=csv_data)
-        normed_data = getDaylyAverageValues(data)
-        dauerlinie_data = data
+        dataCSV = readCsvData(os.path.join(ddir, filename))
+        data = pd.DataFrame(index=dataCSV.index, data=dataCSV)
+        dataSimplified = pd.DataFrame()
+        dataSimplifiedNodes = ["AHK_1", "AHK_1_Biogas", "AHK_1_H2", "AHK_2", "AHK_2_Biogas", "AHK_2_H2", "AHK_3", "HWE_5_1", "Wärmepumpen"]
 
         drop_columns = []
 
-        for column in normed_data.columns:
-            new_column_name = column.replace("(", "").replace(")", "").replace(", 'flow'", "").replace(", ", " > ").replace("'", "")
+        # rename columns
+        for column in data.columns:
+            cleanedColumnName = column.replace("(", "").replace(")", "").replace(", 'flow'", "").replace("'", "")
 
-            if new_column_name.find(filename.replace(".csv", "")) == 0:
-                normed_data[column] = gaussian_filter1d(-normed_data[column], sigma=2)
-                drop_columns.append(new_column_name)
+            # Ist der Bus Eingang oder Ausgang?
+            if cleanedColumnName.find(filename.replace(".csv", "")) == 0:
+                # Wenn er Ausgang ist, wird der Wert negiert
+                data[column] = gaussian_filter1d(-data[column], sigma=2)
             else:
-                normed_data[column] = gaussian_filter1d(normed_data[column], sigma=2)
+                data[column] = gaussian_filter1d(data[column], sigma=2)
 
-            normed_data.rename(columns={column: new_column_name}, inplace=True)
-            dauerlinie_data.rename(columns={column: new_column_name}, inplace=True)
+            data.rename(columns={column: cleanedColumnName}, inplace=True)
 
-        dauerlinie_data.drop(columns=drop_columns, inplace=True)
+        # simplify data
+        for column in data.columns:
+            cleanedColumnName = column.replace("(", "").replace(")", "").replace(", 'flow'", "").replace("'", "")
+
+            inputNode, outputNode = cleanedColumnName.split(", ")
+
+            reducedInputNode = reduceNodeName(inputNode)
+            reducedOutputNode = reduceNodeName(outputNode)
+
+            # Erstmal alle Tabellen suchen und Addieren --> in neuen DF
+            if reducedInputNode in dataSimplifiedNodes:
+                reducedColumn = (reducedInputNode, outputNode)
+            elif reducedOutputNode in dataSimplifiedNodes:
+                reducedColumn = (inputNode, reducedOutputNode)
+            else:
+                reducedColumn = (inputNode, outputNode)
+
+            if reducedColumn in dataSimplified.columns:
+                dataSimplified[reducedColumn] += data[column]
+            else:
+                dataSimplified[reducedColumn] = data[column]
 
 #######################################################################################################################
 ## Plot Area
 #######################################################################################################################
-        data2plot = normed_data
+        data2plot = getDaylyAverageValues(dataSimplified)
 
         fig = plt.figure()
         data2plot.plot(fig=fig,
@@ -57,7 +82,7 @@ def buildStackedPlot(ddir, pdir):
         plt.title(filename.replace(".csv", ""))
         plt.tight_layout()
         plt.xticks(rotation=30)
-        plt.savefig(fname=os.path.join(pdir, filename.replace(".csv", "_stacked.png")),
+        plt.savefig(fname=os.path.join(pdir, "Area Plots", filename.replace(".csv", "_stacked.png")),
                     dpi=None,
                     facecolor='w',
                     edgecolor='w',
@@ -71,7 +96,6 @@ def buildStackedPlot(ddir, pdir):
 #######################################################################################################################
 ## Line Plot
 #######################################################################################################################
-
         fig = plt.figure()
         data2plot.plot(fig=fig,
                        kind='line',
@@ -88,7 +112,7 @@ def buildStackedPlot(ddir, pdir):
         plt.title(filename.replace(".csv", ""))
         plt.tight_layout()
         plt.xticks(rotation=30)
-        plt.savefig(fname=os.path.join(pdir, filename.replace(".csv", "_line.png")),
+        plt.savefig(fname=os.path.join(pdir, "Stacked Plots", filename.replace(".csv", "_line.png")),
                     dpi=None,
                     facecolor='w',
                     edgecolor='w',
@@ -105,34 +129,11 @@ def buildStackedPlot(ddir, pdir):
 
         fig, ax = plt.subplots(figsize=(19.1, 10.5))
 
-        waermepumpen_liste = [column for column in dauerlinie_data.columns if column.startswith("WP_")]
-        
-        jahresdauerlinie_wp = None
-        #print(type(jahresdauerlinie_wp))
-
-        for column in dauerlinie_data:
-            if column in waermepumpen_liste:
-                if type(jahresdauerlinie_wp) == type(None) and jahresdauerlinie_wp == None:
-                    jahresdauerlinie_wp = dauerlinie_data[column]
-                else:
-                    jahresdauerlinie_wp = jahresdauerlinie_wp.add(dauerlinie_data[column])
-                #print(jahresdauerlinie_wp)
-            else:
-                dauerlinie_data[column] = sorted(dauerlinie_data[column], reverse=True)
-                jahresdauerlinie = dauerlinie_data[column]
-
-                plt.plot(
-                    np.linspace(1,8760, 8760),
-                    jahresdauerlinie,
-                    label=column,
-                    drawstyle="steps-post"
-                )
-
-        if not type(jahresdauerlinie_wp) == type(None):
+        for column in dataSimplified:
             plt.plot(
-                np.linspace(1,8760, 8760),
-                sorted(jahresdauerlinie_wp, reverse=True),
-                label="Wärmepumpen",
+                np.linspace(1, 8760, 8760),
+                sorted(dataSimplified[column].abs(), reverse=True),
+                label=column,
                 drawstyle="steps-post"
             )
         
@@ -143,11 +144,11 @@ def buildStackedPlot(ddir, pdir):
         plt.grid(True)
         plt.xlabel("kumulierte Zeit in h")
         plt.ylabel("MW")
-        plt.title("Jahresdauerlinie:" + filename.replace(".csv", ""))
+        plt.title("Jahresdauerlinie: " + filename.replace(".csv", ""))
         plt.tight_layout()
         plt.xticks(rotation=30)
 
-        plt.savefig(fname=os.path.join(pdir, filename.replace(".csv", "") + "_jahresdauerlinie.png"),
+        plt.savefig(fname=os.path.join(pdir, "Jahresganglinien", filename.replace(".csv", "") + "_jahresdauerlinie.png"),
                     dpi=None,
                     facecolor='w',
                     edgecolor='w',
