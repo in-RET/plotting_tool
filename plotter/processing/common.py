@@ -53,8 +53,6 @@ def sumSingleColumnsFromData(df: pd.DataFrame) -> pd.Series:
 
 
 def reduceNodeName(node: str) -> str:
-    reduceNodeName = ""
-
     reduceNodeName = node.replace("HWE_5_1_Nachheizung", "HWE_5_1").replace("HWE_5_1_Heißwasser", "HWE_5_1")
     reduceNodeName = reduceNodeName.replace("AHK_1_KB", "AHK_1").replace("AHK_1_FB", "AHK_1").replace("AHK_1_AB", "AHK_1")
     reduceNodeName = reduceNodeName.replace("AHK_2_KB", "AHK_2").replace("AHK_2_FB", "AHK_2").replace("AHK_2_AB", "AHK_2")
@@ -65,7 +63,7 @@ def reduceNodeName(node: str) -> str:
     reduceNodeName = reduceNodeName.replace("AHK_3_AB", "AHK_3")
     reduceNodeName = reduceNodeName.replace("DT-Tandem HD-Teil", "DT-Tandem").replace("DT-Tandem ND-Teil", "DT-Tandem")
 
-    if reduceNodeName.startswith("WP_"):
+    if reduceNodeName.startswith("WP_") and reduceNodeName not in ["WP_Luftwaerme_direkt", "WP_PVT "]:
         reduceNodeName = "Wärmepumpen"
 
     return reduceNodeName
